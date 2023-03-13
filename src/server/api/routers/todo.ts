@@ -20,4 +20,21 @@ export const todoRouter = createTRPCRouter({
         },
       });
     }),
+  edit: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        data: z.object({
+          isDone: z.boolean().optional(),
+          task: z.string().optional(),
+        }),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, data } = input;
+      const todo = await ctx.todo.update({
+        where: { id },
+        data,
+      });
+    }),
 });
