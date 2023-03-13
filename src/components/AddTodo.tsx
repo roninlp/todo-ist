@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { api } from "~/utils/api";
+
 type AddTodoProps = {
   toggle: () => void;
 };
@@ -7,9 +9,20 @@ type AddTodoProps = {
 const AddTodo = ({ toggle }: AddTodoProps) => {
   const [taskInput, setTaskInput] = useState("");
 
+  const createTodo = api.todo.create.useMutation({});
+
   return (
     <div className="group w-full overflow-hidden rounded-xl border border-gray-200 p-2 ">
-      <form className="flex flex-col" onSubmit={(e) => e.preventDefault()}>
+      <form
+        className="flex flex-col"
+        onSubmit={(e) => {
+          e.preventDefault();
+          createTodo.mutate({
+            task: taskInput,
+          });
+          setTaskInput("");
+        }}
+      >
         <input
           className="input-ghost input input-xs w-full max-w-xs"
           type="text"
@@ -28,7 +41,11 @@ const AddTodo = ({ toggle }: AddTodoProps) => {
           placeholder="Description"
         />
         <div className="mt-2 flex justify-end gap-4 text-sm">
-          <button onClick={(e) => toggle()} className="btn-ghost btn-xs btn">
+          <button
+            type="button"
+            onClick={(e) => toggle()}
+            className="btn-ghost btn-xs btn"
+          >
             Cancel
           </button>
           <button

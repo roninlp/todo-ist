@@ -4,9 +4,13 @@ import Head from "next/head";
 // import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/utils/api";
 import AddTodo from "~/components/AddTodo";
-import { useState } from "react";
+import TodoList from "~/components/TodoList";
+import { useEffect, useState } from "react";
 
 import { SlBubble, SlEqualizer, SlOptions, SlPlus } from "react-icons/sl";
+import { useSession } from "next-auth/react";
+import { inferProcedureOutput } from "@trpc/server";
+import { AppRouter } from "~/server/api/root";
 
 const Home: NextPage = () => {
   const [showAddTask, setShowAddTask] = useState(false);
@@ -14,7 +18,20 @@ const Home: NextPage = () => {
   function toggleShowAddTask() {
     setShowAddTask(!showAddTask);
   }
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+
+  const { data: sessionData } = useSession();
+
+  const { data: todos, refetch: refetchTodos } = api.todo.getall.useQuery(
+    undefined,
+    {
+      enabled: sessionData?.user !== undefined,
+    }
+  );
+  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
+
+  useEffect(() => {
+    refetchTodos();
+  }, [showAddTask]);
 
   return (
     <>
@@ -45,6 +62,11 @@ const Home: NextPage = () => {
               </div>
             </div>
           </header>
+          <div className="w-full px-14 pt-4 ">
+            <div className="mx-auto my-0 flex w-full max-w-3xl items-center">
+              {todos && <TodoList todos={todos} />}
+            </div>
+          </div>
 
           <div className="w-full px-14 pt-4 ">
             <div className="mx-auto my-0 flex w-full max-w-3xl items-center">

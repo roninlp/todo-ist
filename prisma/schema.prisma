@@ -20,6 +20,18 @@ model Example {
     updatedAt DateTime @updatedAt
 }
 
+model Todo {
+    id          String    @id @default(cuid())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    task        String
+    description String?   @db.Text
+    isDone      Boolean   @default(false)
+    dueDate     DateTime?
+    userId      String
+    user        User      @relation(fields: [userId], references: [id])
+}
+
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
@@ -56,6 +68,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    todo          Todo[]
 }
 
 model VerificationToken {
